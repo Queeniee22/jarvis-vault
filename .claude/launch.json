@@ -2,9 +2,15 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "jarvis-hud",
-      "runtimeExecutable": "C:/Users/Mackenzie/jarvis-hud/.venv/Scripts/python.exe",
-      "runtimeArgs": ["-m", "uvicorn", "jarvis.app:app", "--app-dir", "C:/Users/Mackenzie/jarvis-hud", "--host", "127.0.0.1", "--port", "8770"],
+      "name": "jarvis-hud-windows",
+      "runtimeExecutable": "../jarvis-hud/.venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "uvicorn", "jarvis.app:app", "--app-dir", "../jarvis-hud", "--host", "127.0.0.1", "--port", "8770"],
+      "port": 8770
+    },
+    {
+      "name": "jarvis-hud-mac",
+      "runtimeExecutable": "../jarvis-hud/.venv/bin/python",
+      "runtimeArgs": ["-m", "uvicorn", "jarvis.app:app", "--app-dir", "../jarvis-hud", "--host", "127.0.0.1", "--port", "8770"],
       "port": 8770
     }
   ]

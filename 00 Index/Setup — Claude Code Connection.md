@@ -82,27 +82,114 @@ and gives real history. Two repos, deliberately separate:
 
 ## Moving to a second machine
 
-1. Install [Obsidian](https://obsidian.md) (free — only Sync costs money),
-   [git](https://git-scm.com), Node, and Python.
-2. Clone both — GitHub account `Queeniee22`, both repos **private**, branch `main`:
-   ```
-   git clone https://github.com/Queeniee22/jarvis-vault.git Jarvis
-   git clone https://github.com/Queeniee22/jarvis-hud.git
-   ```
-   Auth is Git Credential Manager, which ships with Git for Windows — a browser
-   window opens on the first push, token stored after that. No SSH key or PAT.
-3. Open the cloned `Jarvis` folder in Obsidian → *Open folder as vault*.
-   Settings in `.obsidian/` come with it; **Local REST API must be reinstalled**
-   from Community plugins (the binary is gitignored) and will mint a *new* key.
-4. `cp .env.local.example .env.local` and paste that new key in.
-5. Copy `~/.claude/settings.json` from the old machine. It is just a plugin
-   list — Claude Code re-downloads all 28 plugins itself.
-6. Edit `.claude/launch.json` — it hardcodes `C:/Users/Mackenzie/...`. Change it
-   if the new machine's username differs.
-7. Recreate `jarvis-hud/.env` from its `.env.example`: ElevenLabs key, the new
-   Obsidian key, calendar ID. Re-run `scripts/gcal_auth.py` for Google OAuth —
-   `token.json` and `credentials.json` are machine-bound and not in the repo.
-8. `powershell -ExecutionPolicy Bypass -File .\connect-jarvis.ps1`
+Works on Windows and macOS. The vault and the HUD must end up as **siblings** —
+`Jarvis/` and `jarvis-hud/` in the same parent folder — because
+`.claude/launch.json` resolves the HUD through `../jarvis-hud`.
+
+### 1. Prerequisites
+
+**Windows** — [Obsidian](https://obsidian.md), [Git for Windows](https://git-scm.com),
+Node, Python 3.11+.
+
+**macOS** — Obsidian, Node, Python 3.11+, then:
+
+```
+xcode-select --install        # git
+brew install gh portaudio     # gh for auth; portaudio for sounddevice
+```
+
+### 2. Clone both, side by side
+
+**Windows.** Git Credential Manager ships with Git for Windows and is already
+configured (`credential.helper = manager`). A browser window opens on the first
+push and the token is stored. No SSH key or PAT.
+
+```
+cd ~
+git clone https://github.com/Queeniee22/jarvis-vault.git Jarvis
+git clone https://github.com/Queeniee22/jarvis-hud.git
+```
+
+**macOS.** There is *no* Credential Manager — that is Windows-only. Authenticate
+with `gh` first; it writes git's credential helper for you.
+
+```
+gh auth login     # GitHub.com -> HTTPS -> login with a web browser
+cd ~
+git clone https://github.com/Queeniee22/jarvis-vault.git Jarvis
+git clone https://github.com/Queeniee22/jarvis-hud.git
+```
+
+Commit identity is per-machine and does **not** travel in the repo:
+
+```
+git config --global user.name  "Mackenzie"
+git config --global user.email "connermackenzie2003@gmail.com"
+```
+
+### 3. Obsidian
+
+Open the cloned `Jarvis` folder → *Open folder as vault*. Settings in
+`.obsidian/` come with it, but **Local REST API must be reinstalled** from
+Community plugins — its binary is gitignored — and it mints a **new** key.
+
+Then `cp .env.local.example .env.local` and paste that new key in.
+
+### 4. Claude Code
+
+Copy `~/.claude/settings.json` from the old machine. It is only a plugin list;
+Claude Code re-downloads all 28 plugins itself.
+
+`.claude/launch.json` needs **no editing**. It carries both a
+`jarvis-hud-windows` and a `jarvis-hud-mac` configuration and the paths are
+relative — pick the one matching the platform.
+
+### 5. The HUD
+
+```
+cd ~/jarvis-hud
+python -m venv .venv
+```
+
+**Windows**
+
+```
+.venv\Scripts\python -m pip install -e ".[dev]"
+.venv\Scripts\python run.py
+```
+
+**macOS**
+
+```
+.venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/python run.py
+```
+
+Recreate `jarvis-hud/.env` from its `.env.example`: ElevenLabs key, the new
+Obsidian key, calendar ID. Then run `scripts/gcal_auth.py` for Google OAuth —
+`token.json` and `credentials.json` are machine-bound and not in the repo.
+
+Cross-platform notes: `pyttsx3` (the local voice fallback) uses SAPI on Windows
+and NSSpeechSynthesizer on macOS, so it works on both. `sounddevice` needs
+PortAudio on macOS — that is what `brew install portaudio` in step 1 is for.
+
+### 6. Connect MCP
+
+**Windows**
+
+```
+powershell -ExecutionPolicy Bypass -File .\connect-jarvis.ps1
+```
+
+**macOS**
+
+```
+./connect-jarvis.sh
+```
+
+The fallback patcher is paired the same way — `fix-mcp-config.ps1` /
+`fix-mcp-config.sh`. All four read the key from `$OBSIDIAN_API_KEY` or
+`.env.local`, and none of them contain it.
 
 ### Port collision, again
 

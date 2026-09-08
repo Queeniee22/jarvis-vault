@@ -1,6 +1,6 @@
 ---
 created: 2026-08-08
-updated: 2026-08-08
+updated: 2026-09-08
 tags: [programming/jarvis, runbook]
 ---
 
@@ -11,10 +11,26 @@ Design rationale lives in [[Jarvis HUD Design]]; bugs and their real causes in [
 
 ## Start it
 
+The only cross-platform difference is the venv layout: Windows puts binaries in
+`.venv\Scripts\`, macOS and Linux in `.venv/bin/`.
+
+**Windows**
+
 ```
-cd C:\Users\Mackenzie\jarvis-hud
+cd ~\jarvis-hud
 .venv\Scripts\python run.py
 ```
+
+**macOS**
+
+```
+cd ~/jarvis-hud
+.venv/bin/python run.py
+```
+
+Or from Claude Code, `preview_start` with the `jarvis-hud-windows` or
+`jarvis-hud-mac` configuration in `.claude/launch.json` — both are defined, and
+the vault's copy reaches the HUD through the relative `../jarvis-hud`.
 
 Then open `http://127.0.0.1:8770` and press F11. Boot takes ~15s: it loads the
 Whisper model, reads the vault, then greets aloud.
@@ -24,15 +40,17 @@ Whisper model, reads the vault, then greets aloud.
 Two runtimes, so two runners. One command covers both:
 
 ```
-.venv\Scripts\python run_tests.py
+.venv\Scripts\python run_tests.py     # Windows
+.venv/bin/python run_tests.py         # macOS
 ```
 
-Or separately:
+`run_tests.py` already picks `npm.cmd` vs `npm` per platform, so it needs no
+flags. Or separately:
 
-| Suite | Command | Count |
-|---|---|---|
-| Backend | `.venv\Scripts\python -m pytest -q` | 132 |
-| Frontend | `npm test` | 56 |
+| Suite | Windows | macOS | Count |
+|---|---|---|---|
+| Backend | `.venv\Scripts\python -m pytest -q` | `.venv/bin/python -m pytest -q` | 132 |
+| Frontend | `npm test` | `npm test` | 56 |
 
 The frontend harness is Node's built-in runner plus **jsdom** — one dependency,
 no build step. `tests/js/hud-dom.mjs` loads a file from `static/js` into a
@@ -93,7 +111,8 @@ Done — the TODAY panel shows real events. Kept here for when the token expires
    - User type must be **External** — *Internal* rejects personal Gmail
    - Add `connermackenzie2003@gmail.com` under **Test users**, or the consent screen returns `Error 403: access_denied`
    - Click **PUBLISH APP** — while in *Testing*, Google expires refresh tokens after **7 days** and the calendar silently dies weekly. The "unverified app" warning at consent is expected (*Advanced → Go to (unsafe)*).
-5. `.venv\Scripts\python scripts\gcal_auth.py` → consent in the browser → writes `token.json`
+5. `.venv\Scripts\python scripts\gcal_auth.py` — macOS: `.venv/bin/python scripts/gcal_auth.py`
+   → consent in the browser → writes `token.json`
 6. Restart the HUD
 
 Scope is read-only. `credentials.json` and `token.json` are gitignored.
@@ -111,9 +130,10 @@ poll.
 | "calendar offline — not authorized" | OAuth not done — see above |
 | "calendar access expired" | Refresh token died (the 7-day *Testing* expiry). Re-run `scripts/gcal_auth.py`, and publish the app to stop it recurring. |
 | No voice, chat fine | `VOICE_ID` isn't in the ElevenLabs account, or no key |
-| Voice sounds robotic | ElevenLabs quota used up (10k chars/month) — it fell back to the local Windows voice. Restart after the reset. Service row shows **degraded**. |
+| Voice sounds robotic | ElevenLabs quota used up (10k chars/month) — it fell back to the local system voice (`pyttsx3` — SAPI on Windows, NSSpeechSynthesizer on macOS). Restart after the reset. Service row shows **degraded**. |
 | A change doesn't show up | A leftover server is holding 8770 and serving stale code. `run.py` refuses to start and names the PID — read its output. |
 | A skill did nothing | Hover it for its state; check its `## Run log` in the note. Skills run one at a time — a second click while one is running reports busy. |
+| Mic dead on macOS only | `sounddevice` needs PortAudio: `brew install portaudio`, then rebuild the venv. Also check System Settings → Privacy & Security → Microphone. |
 | Mic seems dead | Check the waveform moves while holding `SPACE`. `scripts/mic_test.py` and `scripts/ears_test.py` test the mic and the full transcribe path. |
 | Replies take ~5s | Expected. Fixed Claude CLI startup, not tunable — see [[Stack and Tools]] § Decisions. The spoken filler covers it. |
 

@@ -1,3 +1,9 @@
-# Normalise line endings so the two machines don't diff every file.
+# Normalise line endings so the machines don't diff every file.
 * text=auto eol=lf
+
+# PowerShell is Windows-only; CRLF is its native form.
 *.ps1 text eol=crlf
+
+# Shell scripts MUST stay LF. A CRLF shebang line makes macOS/Linux fail
+# with "bad interpreter: no such file or directory".
+*.sh text eol=lf

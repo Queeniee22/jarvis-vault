@@ -69,8 +69,8 @@ and gives real history. Two repos, deliberately separate:
 
 | Repo | Contents |
 |---|---|
-| `jarvis-vault` | this vault — memory, `06 Skills/`, `CLAUDE.md`, `.claude/` config |
-| `jarvis-hud` | the app at `C:\Users\Mackenzie\jarvis-hud` |
+| [`jarvis-vault`](https://github.com/Queeniee22/jarvis-vault) | this vault — memory, `06 Skills/`, `CLAUDE.md`, `.claude/` config |
+| [`jarvis-hud`](https://github.com/Queeniee22/jarvis-hud) | the app at `C:\Users\Mackenzie\jarvis-hud` |
 
 ### Never committed
 
@@ -84,7 +84,13 @@ and gives real history. Two repos, deliberately separate:
 
 1. Install [Obsidian](https://obsidian.md) (free — only Sync costs money),
    [git](https://git-scm.com), Node, and Python.
-2. `git clone <jarvis-vault-url> Jarvis` and `git clone <jarvis-hud-url>`.
+2. Clone both — GitHub account `Queeniee22`, both repos **private**, branch `main`:
+   ```
+   git clone https://github.com/Queeniee22/jarvis-vault.git Jarvis
+   git clone https://github.com/Queeniee22/jarvis-hud.git
+   ```
+   Auth is Git Credential Manager, which ships with Git for Windows — a browser
+   window opens on the first push, token stored after that. No SSH key or PAT.
 3. Open the cloned `Jarvis` folder in Obsidian → *Open folder as vault*.
    Settings in `.obsidian/` come with it; **Local REST API must be reinstalled**
    from Community plugins (the binary is gitignored) and will mint a *new* key.

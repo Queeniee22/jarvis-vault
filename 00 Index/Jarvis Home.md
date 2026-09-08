@@ -1,6 +1,6 @@
 ---
 created: 2026-08-06
-updated: 2026-08-08
+updated: 2026-09-08
 tags: [index/moc]
 ---
 
@@ -55,10 +55,11 @@ Repeatable work Jarvis runs on demand or on a schedule — see [[06 Skills/READM
 
 ## Operations
 
-- Daily notes: `05 Daily/` — [[2026-08-08]] (latest) · [[2026-08-06]]
+- Daily notes: `05 Daily/` — [[2026-09-08]] (latest) · [[2026-08-08]] · [[2026-08-06]]
 - Unsorted capture: [[99 Inbox/README|Inbox]] (`99 Inbox/`)
 - Memory protocol: `CLAUDE.md` at vault root
-- [[Setup — Claude Code Connection]]
+- [[Setup — Claude Code Connection]] — wiring, ports, and how to stand this vault up on a second machine
+- Version control: this vault is a git repo (`jarvis-vault`), the app is `jarvis-hud`. Replaces Obsidian Sync.
 
 ## Automations
 

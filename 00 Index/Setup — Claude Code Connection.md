@@ -1,6 +1,6 @@
 ---
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-09-08
 tags: [meta/setup]
 ---
 
@@ -18,7 +18,9 @@ How Jarvis is wired. Keep current if anything changes.
 - **Local REST API with MCP** v5.0.3 — Adam Coddington
 - **HTTP MCP endpoint (in use): `http://127.0.0.1:27125/mcp/`**
 - HTTPS endpoint (unused): `https://127.0.0.1:27126/mcp/`
-- Auth: bearer token in `.obsidian/plugins/obsidian-local-rest-api/data.json`
+- Auth: bearer token. Canonical copy for scripts is `.env.local` at the vault root (gitignored).
+  Obsidian's own copy lives in `.obsidian/plugins/obsidian-local-rest-api/data.json` — also gitignored,
+  because that file holds the API key **and** the CA private key.
 - **Obsidian must be running** for MCP to respond. Claude Code still reads/writes the files directly when it isn't.
 
 ## Working config
@@ -59,3 +61,54 @@ If MCP breaks, path 1 still works. Nothing is lost.
 ## Lesson learned
 
 The plugin settings UI showing "Enabled" means *configured*, not *listening*. Always verify with `curl` against the actual endpoint.
+
+## Version control — replaces Obsidian Sync
+
+The vault is a git repo. Obsidian Sync is paid; a private GitHub remote is free
+and gives real history. Two repos, deliberately separate:
+
+| Repo | Contents |
+|---|---|
+| `jarvis-vault` | this vault — memory, `06 Skills/`, `CLAUDE.md`, `.claude/` config |
+| `jarvis-hud` | the app at `C:\Users\Mackenzie\jarvis-hud` |
+
+### Never committed
+
+- `.env.local` — the REST API key
+- `.obsidian/plugins/` — same key plus the CA private key
+- `.obsidian/workspace.json` — per-machine pane layout, conflicts constantly
+
+`.env.local.example` is the tracked template. Copy and fill on each machine.
+
+## Moving to a second machine
+
+1. Install [Obsidian](https://obsidian.md) (free — only Sync costs money),
+   [git](https://git-scm.com), Node, and Python.
+2. `git clone <jarvis-vault-url> Jarvis` and `git clone <jarvis-hud-url>`.
+3. Open the cloned `Jarvis` folder in Obsidian → *Open folder as vault*.
+   Settings in `.obsidian/` come with it; **Local REST API must be reinstalled**
+   from Community plugins (the binary is gitignored) and will mint a *new* key.
+4. `cp .env.local.example .env.local` and paste that new key in.
+5. Copy `~/.claude/settings.json` from the old machine. It is just a plugin
+   list — Claude Code re-downloads all 28 plugins itself.
+6. Edit `.claude/launch.json` — it hardcodes `C:/Users/Mackenzie/...`. Change it
+   if the new machine's username differs.
+7. Recreate `jarvis-hud/.env` from its `.env.example`: ElevenLabs key, the new
+   Obsidian key, calendar ID. Re-run `scripts/gcal_auth.py` for Google OAuth —
+   `token.json` and `credentials.json` are machine-bound and not in the repo.
+8. `powershell -ExecutionPolicy Bypass -File .\connect-jarvis.ps1`
+
+### Port collision, again
+
+The 27125/27126 choice exists because of the **Cheat Sheet** vault (see above).
+If that vault isn't on the new machine the defaults are free — but the config
+carries the non-default ports regardless, so leave them alone unless something
+breaks.
+
+### Day-to-day sync
+
+`git pull` when you sit down, `git push` when you get up. Two machines editing
+the same note between pushes will conflict — markdown conflicts are readable
+and resolved by hand, which is the tradeoff for not paying for Sync.
+
+Related: [[Stack and Tools]], [[Jarvis HUD Runbook]]

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__obsidian__vault_read",
+      "mcp__obsidian__vault_patch",
+      "mcp__obsidian__vault_get_document_map",
+      "mcp__obsidian__vault_write",
+      "PowerShell(pip *)",
+      "Skill(run)",
+      "PowerShell(New-Item *)",
+      "PowerShell(powershell -WindowStyle Hidden -NoProfile -Command \"Add-Type -AssemblyName System.Speech; `$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; `$s.Rate = 1; `$s.Speak\\('Jarvis online. Voice test successful.'\\)\")",
+      "PowerShell(Get-ChildItem \"HKLM:\\\\SOFTWARE\\\\Microsoft\\\\Speech_OneCore\\\\Voices\\\\Tokens\" -ErrorAction SilentlyContinue | ForEach-Object { $_.PSChildName })",
+      "mcp__visualize__read_me",
+      "Bash(mkdir -p \"C:/Users/Mackenzie/jarvis-hud/docs\" && echo created)",
+      "Read(//c/Users/Mackenzie/AppData/Roaming/Claude/local-agent-mode-sessions/b9a906aa-15d1-46a8-a97d-464d9b9153c8/ed80509c-28c7-4475-b9c0-ec517fd02e9e/rpm/plugin_01EBWKnW1zG1w7Mmh7aa1jYk/skills/subagent-driven-development/**)",
+      "Bash(python -m venv .venv)",
+      "Bash(.venv/Scripts/python -m pip install -e \".[dev]\")",
+      "Bash(.venv/Scripts/python -m pytest -q)"
+    ]
+  }
+}

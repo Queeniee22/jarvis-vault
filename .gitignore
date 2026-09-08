@@ -1,0 +1,18 @@
+# --- Secrets: never commit ---------------------------------------------
+.env
+.env.local
+.secrets-backup/
+
+# Obsidian Local REST API plugin config holds apiKey + TLS privateKey.
+# The plugin binary/manifest are re-downloaded by Obsidian on install.
+.obsidian/plugins/
+
+# --- Machine-specific state --------------------------------------------
+# Which panes/tabs are open. Pure UI noise; conflicts on every sync.
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# --- OS junk ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini

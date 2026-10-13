@@ -131,9 +131,34 @@ git config --global user.email "connermackenzie2003@gmail.com"
 
 Open the cloned `Jarvis` folder → *Open folder as vault*. Settings in
 `.obsidian/` come with it, but **Local REST API must be reinstalled** from
-Community plugins — its binary is gitignored — and it mints a **new** key.
+Community plugins — its binary is gitignored.
 
-Then `cp .env.local.example .env.local` and paste that new key in.
+Because `.obsidian/plugins/` is gitignored, the plugin's *settings* do not
+travel either. A fresh install mints a new key **and reverts to default ports
+with the HTTP server switched off**, so `connect-jarvis` will not find it.
+Reproduce all four of these in *Settings → Local REST API*:
+
+| Setting | Must be | Fresh-install default |
+|---|---|---|
+| Non-encrypted (HTTP) server | **enabled** | disabled |
+| Non-encrypted port | **27125** | 27123 |
+| Encrypted (HTTPS) server | enabled | enabled |
+| Encrypted port | **27126** | 27124 |
+
+The ports are not arbitrary — see *Non-default ports* above for why 27123/27124
+are unusable. If you would rather leave the plugin on its defaults, set
+`OBSIDIAN_PORT=27123` in `.env.local` instead; both scripts read it.
+
+Then `cp .env.local.example .env.local` and paste the new key in.
+
+Verify before moving on — this is the check that actually proves it is listening:
+
+```
+curl -H "Authorization: Bearer $OBSIDIAN_API_KEY" http://127.0.0.1:27125/
+```
+
+Expect `"authenticated": true`. "Enabled" in the settings UI means *configured*,
+not *listening*.
 
 ### 4. Claude Code
 
